@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
-import { actionCreators } from '../store';
 import ToDo from '../components/ToDo';
+import { addToDo, deleteToDo } from '../store';
 
 const Home = ({ toDos, addToDo }) => {
   const [text, setText] = useState('');
@@ -43,10 +43,10 @@ const mapStateToProps = (state, ownProps) => ({
 // return 되는 객체는 해당 컴포넌트의 props에 추가된다.
 const mapDispatchToProps = (dispatch, ownProps) => ({
   addToDo(text) {
-    return dispatch(actionCreators.addToDo(text));
+    return dispatch(addToDo(text));
   },
   deleteToDo(id) {
-    return dispatch(actionCreators.deleteToDo(id));
+    return dispatch(deleteToDo(id));
   }
 });
 
