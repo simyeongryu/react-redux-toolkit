@@ -1,68 +1,140 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# react-redux & toolkit
 
-## Available Scripts
+getState()는 state를 얻고, dispatch는 reducer에 action을 전달한다.
 
-In the project directory, you can run:
+## 1. 설치
 
-### `yarn start`
+```
+$ yarn add redux react-redux
+```
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 2. react redux 연결하기
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+### store.js 파일 생성 및 셋업
 
-### `yarn test`
+#### store.js
+```js
+import { createStore } from 'redux';
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+// reducer type
+const ADD = 'ADD';
+const DELETE = 'DELETE';
 
-### `yarn build`
+// action creator
+export const addToDo = text => {
+  return {
+    type: ADD,
+    text
+  };
+};
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+export const deleteToDo = id => {
+  return {
+    type: DELETE,
+    id
+  };
+};
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+// dispatch를 통해 전달되는 action에 따라 state를 변화 시킨다.
+const reducer = (state = [], action) => {
+  switch (action.type) {
+    case ADD:
+      return [{ text: action.text, id: Date.now() }, ...state];
+    case DELETE:
+      return state.filter(toDo => toDo !== action.id);
+    default:
+      return state;
+  }
+};
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+// store
+const store = createStore(reducer);
 
-### `yarn eject`
+export default store;
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### index.js에 store 연결하기
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+#### index.js
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './components/App';
+import { Provider } from 'react-redux';
+import store from './store';
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
 
-## Learn More
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 3. 컴포넌트에서 store의 state 가져오기
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+`connect()` 함수를 사용한다.
 
-### Code Splitting
+#### /routes/Home.js
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+```js
+import React, { useState } from 'react';
+import { connect } from 'react-redux';
 
-### Analyzing the Bundle Size
+const Home = ({ toDos }) => {
+  const [text, setText] = useState();
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+  const onChange = e => {
+    setText(e.target.value);
+  };
 
-### Making a Progressive Web App
+  const onSubmit = e => {
+    e.preventDefault();
+    setText('');
+  };
+  return (
+    <>
+      <h1>To Do</h1>
+      <form onSubmit={onSubmit}>
+        <input type="text" onChange={onChange}></input>
+        <button>Add</button>
+      </form>
+      <ul></ul>
+    </>
+  );
+};
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+// state: store의 현재 state
+// ownProps: 현재 컴포넌트의 props
+// return 되는 객체는 해당 컴포넌트의 props에 추가된다.
+const mapStateToProps = (state, ownProps) => ({
+  toDos: state
+});
 
-### Advanced Configuration
+// dispatch(action): 파라미터의 action을 reducer로 보낸다.
+// ownProps: 현재 컴포넌트의 props
+// return 되는 객체는 해당 컴포넌트의 props에 추가된다.
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  addToDo(text) {
+    return dispatch(actionCreators.addToDo(text));
+  }
+});
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+// connect() 함수를 이용하여 store와 해당 컴포넌트를 연결한다.
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
+```
 
-### Deployment
+state를 props로 가져와서 해당 컴포넌트에서 필요한 방식으로 가공하여 사용한다.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+## 4. Redux Toolkit
 
-### `yarn build` fails to minify
+Redux의 코드를 줄여주는 라이브러리
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+```
+yarn add @reduxjs/toolkit
+```
+
+### createAction
+
