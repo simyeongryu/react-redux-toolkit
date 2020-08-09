@@ -158,8 +158,9 @@ const reducer = createReducer([], {
 
 ```
 
-
 ### 여러 리듀서 사용하기
 
 redux의 combineReducer 사용
+
+
 
