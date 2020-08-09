@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 const Detail = ({ toDo }) => {
@@ -20,7 +19,7 @@ const mapStateToProps = (state, ownProps) => {
   } = ownProps;
 
   return {
-    toDo: state.find(toDo => toDo.id === Number(id))
+    toDo: state.toDos.find(toDo => toDo.id === Number(id))
   };
 };
 
