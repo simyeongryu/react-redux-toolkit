@@ -1,4 +1,4 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const toDos = createSlice({
   name: 'toDosReducer',
@@ -13,8 +13,6 @@ const toDos = createSlice({
   }
 });
 
-const store = configureStore({ reducer: toDos.reducer });
-
 export const { addToDo, deleteToDo } = toDos.actions;
 
-export default store;
+export default toDos.reducer;
